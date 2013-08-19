@@ -1,2 +1,4 @@
-# import "fmt"
+package datacollector
+
+// import "fmt"
 

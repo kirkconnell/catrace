@@ -1,10 +1,10 @@
+package models
+
 import (
-    "fmt"
     "time"
 
     "appengine"
     "appengine/datastore"
-    "appengine/user"
 )
 
 type Image struct {
@@ -18,8 +18,9 @@ type Image struct {
     VotedAt      time.Time
 }
 
-func (i *Image) Save(c appengine.Context) boolean {
-    key, err := datastore.Put(c, datastore.NewIncompleteKey(c, "image", nil), &i)
+func (i *Image) Save(c appengine.Context) bool {
+    // TODO: Figure out what todo with the Key
+    _, err := datastore.Put(c, datastore.NewIncompleteKey(c, "image", nil), &i)
     if err != nil {
         c.Errorf("Saving Image to Datastore failed with error: %v", err.Error())
         return false
