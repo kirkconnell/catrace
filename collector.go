@@ -1,15 +1,16 @@
 package catrace
 
 import (
+	"fmt"
 	"strings"
     "net/http"
-    "bytes"
     "io/ioutil"
     "time"
 
     "appengine"
     "appengine/datastore"
     "appengine/taskqueue"
+    "appengine/urlfetch"
 )
 
 func init() {
@@ -21,7 +22,8 @@ func collectUrls(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
     url := "http://catoverflow.com/api/query?offset=0&limit=1000"
     
-    resp, err := http.Get(url)
+    client := urlfetch.Client(c)    
+    resp, err := client.Get(url)
 	if err != nil {
     	http.Error(w, err.Error(), http.StatusInternalServerError)
     	return
@@ -34,8 +36,7 @@ func collectUrls(w http.ResponseWriter, r *http.Request) {
     }
     
     //Split the body by new lines to get the url for each image.
-    n := bytes.Index(body, []byte{0})
-    s := string(body[:n])
+    s := string(body)
     
     urls := strings.Fields(s)
     for _, u := range urls {
@@ -53,12 +54,22 @@ func worker(w http.ResponseWriter, r *http.Request) {
     
     q := datastore.NewQuery("Image").Filter("OriginalUrl =", url).KeysOnly()
     t := q.Limit(1).Run(c)
-    if t == nil {
-    	img := new(Image)
-    	img.OriginalUrl = url
-    	img.Category = "cats"
-    	img.CreatedAt = time.Now()
-    	img.Save(c)
+    var img Image
+    _, err := t.Next(&img)
+    fmt.Printf("Image is: %v", img)
+    
+	if err == datastore.Done {
+		img := new(Image)
+		img.OriginalUrl = url
+		img.Category = "cats"
+		img.CreatedAt = time.Now()
+		img.Views = 0
+		img.Votes = 0
+		img.Rank = 0
+		img.Save(c)
+	} else if err != nil {
+        c.Errorf("Fetching Images from data store failed: %v", err.Error())
+        return
     }
 }
 
