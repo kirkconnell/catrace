@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Catmin</title>
+  </head>
+  <body>
+    <h1>Pick your favorite cat</h1>
+    <div>
+      <div>
+        <img src="{{.Image1.OriginalUrl}}">
+        <form action="/vote" method="post">
+          <input type="hidden" name="image_url" value="{{.Image1.OriginalUrl}}">
+          <input type="submit" value="Vote">
+        </form>
+    </div>
+    <div>
+      <img src="{{.Image2.OriginalUrl}}">
+      <form action="/vote" method="post">
+        <input type="hidden" name="image_url" value="{{.Image2.OriginalUrl}}">
+        <input type="submit" value="Vote">
+      </form>
+    </div>
+  </body>
+</html>
