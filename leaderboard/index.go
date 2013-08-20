@@ -1,4 +1,4 @@
-package leaderboard
+package catrace
 
 import (
     "fmt"

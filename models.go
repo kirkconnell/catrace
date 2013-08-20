@@ -1,4 +1,4 @@
-package models
+package catrace
 
 import (
     "time"
@@ -20,7 +20,7 @@ type Image struct {
 
 func (i *Image) Save(c appengine.Context) bool {
     // TODO: Figure out what todo with the Key
-    _, err := datastore.Put(c, datastore.NewIncompleteKey(c, "image", nil), &i)
+    _, err := datastore.Put(c, datastore.NewIncompleteKey(c, "Image", nil), &i)
     if err != nil {
         c.Errorf("Saving Image to Datastore failed with error: %v", err.Error())
         return false
