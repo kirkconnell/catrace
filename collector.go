@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	http.HandleFunc("/", collectUrls)
+	http.HandleFunc("/datacollector", collectUrls)
     http.HandleFunc("/worker", worker)
 }
 
@@ -58,7 +58,7 @@ func worker(w http.ResponseWriter, r *http.Request) {
     	img.OriginalUrl = url
     	img.Category = "cats"
     	img.CreatedAt = time.Now()
-    	img.Save()
+    	img.Save(c)
     }
 }
 
