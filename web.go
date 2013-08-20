@@ -16,6 +16,7 @@ var templates = make(map[string]*template.Template)
 func init() {
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/catmin", adminHandler)
+  http.HandleFunc("/vote", voteHandler)
 
 	for _, tmpl := range []string{"catmin"} {
 		templates[tmpl] = template.Must(template.ParseFiles("templates/" + tmpl + ".html"))
@@ -48,14 +49,20 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, obs, "catmin")
 }
 
-// func voteHandler(w http.ResponseWriter, r *http.Request) {
-//  c := appengine.NewContext(r)
-//  url := r.FormValue("image_url")
-//
-//  img := getImage(c, url)
-//  img.Votes += 1
-//  img.Save(c)
-//}
+func voteHandler(w http.ResponseWriter, r *http.Request) {
+  c := appengine.NewContext(r)
+  url := r.FormValue("image_url")
+
+  img, err := ImageByOriginalUrl(c, url)
+  if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+  }
+
+  img.Votes += 1
+  img.Save(c)
+
+  http.Redirect(w, r, "/catmin", 302)
+}
 
 func renderTemplate(w http.ResponseWriter, obs map[string]interface{}, tmpl string) {
 	if err := templates[tmpl].Execute(w, obs); err != nil {
